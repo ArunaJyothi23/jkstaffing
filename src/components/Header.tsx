@@ -64,7 +64,7 @@ export default function Header() {
           scrolled ? 'pt-3' : 'pt-5'
         }`}
       >
-        <div className={`container max-w-7xl mx-auto transition-all duration-300 bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl ${
+        <div className={`container max-w-7xl mx-auto transition-all duration-300 bg-white rounded-2xl ${
           scrolled ? 'shadow-nav py-1.5 px-4 lg:px-6' : 'shadow-lg py-2 px-4 lg:px-6'
         }`}>
           <div className="flex items-center justify-between">
@@ -160,7 +160,7 @@ export default function Header() {
                   width={200}
                   height={60}
                   quality={100}
-                  className="object-contain w-auto h-12"
+                  className="object-contain w-auto h-12 mix-blend-multiply"
                 />
               </div>
               <button
