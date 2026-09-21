@@ -1,12 +1,17 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
 import AppImage from '@/components/ui/AppImage';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function CandidateHero() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    heroTitle: 'Find Your Next Opportunity',
+    heroText: 'We help individuals identify employment opportunities that match their skills, experience and career goals. Explore roles across multiple sectors throughout the UK.',
+    heroImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_148b9b9ca-1786125102528.png',
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -22,7 +27,15 @@ export default function CandidateHero() {
       { threshold: 0.1 }
     );
     if (ref?.current) observer?.observe(ref?.current);
-    return () => observer?.disconnect();
+
+    const unsubscribe = subscribeDocument('site_content', 'candidates_page', (doc) => {
+      if (doc) setContent(prev => ({ ...prev, ...doc }));
+    });
+
+    return () => {
+      observer?.disconnect();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -34,23 +47,23 @@ export default function CandidateHero() {
       
       <div className="absolute inset-0 z-0">
         <AppImage
-          src="https://img.rocket.new/generatedImages/rocket_gen_img_148b9b9ca-1786125102528.png"
-          alt="Young professional candidate confidently walking in a bright UK city, career opportunity, professional attire"
+          src={content.heroImage}
+          alt={content.heroTitle}
           fill
           priority
-          className="object-cover object-top"
-          sizes="100vw" />
-        
+          className="object-cover"
+          sizes="100vw"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent" />
       </div>
       <div className="container max-w-7xl mx-auto px-4 lg:px-8 py-20 relative z-10">
         <div className="max-w-3xl">
           <div className="fade-up section-label text-primary mb-4">For Candidates</div>
           <h1 className="fade-up stagger-1 text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-primary mb-6">
-            Find Your Next Opportunity
+            {content.heroTitle}
           </h1>
           <p className="fade-up stagger-2 text-foreground/90 font-medium text-lg leading-relaxed mb-8">
-            We help individuals identify employment opportunities that match their skills, experience and career goals. Explore roles across multiple sectors throughout the UK.
+            {content.heroText}
           </p>
           <div className="fade-up stagger-3 flex flex-wrap gap-3">
             <a href="#job-search" className="btn-primary text-base py-3 px-7">

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function RequestStaffForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -10,6 +11,18 @@ export default function RequestStaffForm() {
     staffCount: '', role: '', industry: '', employmentType: '',
     startDate: '', location: '', message: '',
   });
+
+  const [content, setContent] = useState({
+    formTitle: 'Request Staff',
+    formText: 'Tell us about your staffing requirements and a member of our team will contact you to discuss how we can help.',
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'employers_page', (doc) => {
+      if (doc) setContent(prev => ({ ...prev, ...doc }));
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -24,10 +37,10 @@ export default function RequestStaffForm() {
     <section className="section-padding bg-background" id="request-staff" aria-label="Request staff form">
       <div className="container max-w-4xl mx-auto px-4 lg:px-8">
         <div className="text-center mb-12">
-          <div className="section-label justify-center mb-4">Get In Touch</div>
-          <h2 className="text-section-title font-extrabold text-primary mb-4">Request Staff</h2>
+          <div className="section-label justify-center mb-4">Partner With Us</div>
+          <h2 className="text-section-title font-extrabold text-primary mb-4">{content.formTitle}</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Fill in the form below and our team will be in touch to discuss your staffing requirements.
+            {content.formText}
           </p>
         </div>
 

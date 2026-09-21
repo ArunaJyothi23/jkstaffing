@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 const badges = [
 { label: 'Staffing', icon: 'UserGroupIcon' },
@@ -15,6 +16,10 @@ const badges = [
 
 export default function HeroSection() {
   const heroRef = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    heroTitle: 'Connecting Businesses with Reliable People & Candidates with Great Opportunities',
+    heroImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1d0346ec5-1772458054183.png',
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -30,7 +35,17 @@ export default function HeroSection() {
       { threshold: 0.1 }
     );
     if (heroRef.current) observer.observe(heroRef.current);
-    return () => observer.disconnect();
+
+    const unsubscribe = subscribeDocument('site_content', 'global', (doc) => {
+      if (doc) {
+        setContent(prev => ({ ...prev, ...doc }));
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -43,8 +58,8 @@ export default function HeroSection() {
       {/* Background Image with scrim */}
       <div className="absolute inset-0 z-0">
         <AppImage
-          src="https://img.rocket.new/generatedImages/rocket_gen_img_1d0346ec5-1772458054183.png"
-          alt="Diverse professionals collaborating in a modern UK office environment, bright natural light, professional attire"
+          src={content.heroImage}
+          alt="Hero Background"
           fill
           priority
           className="object-cover object-center"
@@ -77,9 +92,7 @@ export default function HeroSection() {
             </div>
 
             <h1 className="fade-up stagger-1 text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-tight tracking-tighter">
-              Connecting Businesses with{' '}
-              <span className="text-accent">Reliable People</span>{' '}
-              & Candidates with Great Opportunities
+              {content.heroTitle}
             </h1>
 
             <p className="fade-up stagger-2 text-foreground/90 text-lg leading-relaxed max-w-2xl font-medium">

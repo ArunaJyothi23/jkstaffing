@@ -1,11 +1,17 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AppImage from '@/components/ui/AppImage';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function ContactHero() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    heroTitle: 'Get in Touch',
+    heroText: 'Whether you are an employer looking for reliable staff or a candidate seeking your next opportunity, we are here to help.',
+    heroImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1d0346ec5-1772458054183.png',
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -21,7 +27,15 @@ export default function ContactHero() {
       { threshold: 0.1 }
     );
     if (ref?.current) observer?.observe(ref?.current);
-    return () => observer?.disconnect();
+
+    const unsubscribe = subscribeDocument('site_content', 'contact_page', (doc) => {
+      if (doc) setContent(prev => ({ ...prev, ...doc }));
+    });
+
+    return () => {
+      observer?.disconnect();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -33,8 +47,8 @@ export default function ContactHero() {
       
       <div className="absolute inset-0 z-0">
         <AppImage
-          src="https://img.rocket.new/generatedImages/rocket_gen_img_1d0346ec5-1772458054183.png"
-          alt="Professional UK business team in a bright modern office, collaborative discussion, welcoming environment"
+          src={content.heroImage}
+          alt={content.heroTitle}
           fill
           priority
           className="object-cover"
@@ -46,10 +60,10 @@ export default function ContactHero() {
         <div className="max-w-3xl">
           <div className="fade-up section-label text-primary mb-4">Get In Touch</div>
           <h1 className="fade-up stagger-1 text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-primary mb-6">
-            Let&apos;s Discuss Your Staffing Requirements
+            {content.heroTitle}
           </h1>
           <p className="fade-up stagger-2 text-foreground/90 font-medium text-lg leading-relaxed mb-8">
-            Have a query about our services, need to request staff urgently, or want to register as a job candidate? Reach out to our team today.
+            {content.heroText}
           </p>
           <div className="fade-up stagger-3 flex flex-wrap gap-6">
             <div className="flex items-center gap-3 text-foreground/80">

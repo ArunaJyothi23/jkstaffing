@@ -1,12 +1,18 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import AppImage from '@/components/ui/AppImage';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function EmployerHero() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    heroTitle: 'Reliable Staffing for Your Business',
+    heroText: 'We provide temporary, permanent, and contract staff across multiple sectors, ensuring your operational needs are met with compliance-verified candidates.',
+    heroImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_133b1e7cf-1768750078214.png',
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -22,7 +28,15 @@ export default function EmployerHero() {
       { threshold: 0.1 }
     );
     if (ref?.current) observer?.observe(ref?.current);
-    return () => observer?.disconnect();
+
+    const unsubscribe = subscribeDocument('site_content', 'employers_page', (doc) => {
+      if (doc) setContent(prev => ({ ...prev, ...doc }));
+    });
+
+    return () => {
+      observer?.disconnect();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -34,8 +48,8 @@ export default function EmployerHero() {
       
       <div className="absolute inset-0 z-0">
         <AppImage
-          src="https://img.rocket.new/generatedImages/rocket_gen_img_133b1e7cf-1768750078214.png"
-          alt="Business professionals in a corporate meeting room reviewing staffing plans, bright modern UK office, professional environment"
+          src={content.heroImage}
+          alt={content.heroTitle}
           fill
           priority
           className="object-cover"
@@ -47,10 +61,10 @@ export default function EmployerHero() {
         <div className="max-w-3xl">
           <div className="fade-up section-label text-primary mb-4">For Employers</div>
           <h1 className="fade-up stagger-1 text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-primary mb-6">
-            Find the Right People for Your Business
+            {content.heroTitle}
           </h1>
           <p className="fade-up stagger-2 text-foreground/90 font-medium text-lg leading-relaxed mb-8">
-            Whether you need short-term cover, permanent recruitment, specialist security personnel or complete workforce coordination, JK Staffing provides tailored staffing solutions built around your business requirements.
+            {content.heroText}
           </p>
           <div className="fade-up stagger-3 flex flex-wrap gap-3">
             <a href="#request-staff" className="btn-primary text-base py-3 px-7">

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -10,6 +11,22 @@ export default function ContactForm() {
     name: '', company: '', email: '', phone: '',
     enquiryType: '', message: '',
   });
+
+  const [content, setContent] = useState({
+    formTitle: 'Send us a Message',
+    formText: 'Fill out the form below and we will get back to you as soon as possible.',
+    officeAddress: '123 Business Center, London, UK',
+    officePhone: '+44 (0) 20 1234 5678',
+    officeEmail: 'info@jkstaffing.co.uk'
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'contact_page', (doc) => {
+      if (doc) setContent(prev => ({ ...prev, ...doc }));
+    });
+    return () => unsubscribe();
+  }, []);
+
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -30,40 +47,44 @@ export default function ContactForm() {
       <div className="container max-w-7xl mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Contact Info */}
-          <div className="flex flex-col gap-6">
+          <div className="lg:col-span-1 space-y-8">
             <div>
-              <div className="section-label mb-4">Contact Details</div>
-              <h2 className="text-section-title font-extrabold text-primary mb-4">We&apos;re Here to Help</h2>
-              <p className="text-muted-foreground leading-relaxed text-sm">
-                Our team is available during office hours to assist with staffing enquiries, candidate registrations, and general questions.
+              <h2 className="text-3xl font-extrabold text-primary mb-6">{content.formTitle}</h2>
+              <p className="text-muted-foreground mb-8">
+                {content.formText}
               </p>
             </div>
-
-            <div className="flex flex-col gap-4">
-              {[
-                { icon: 'EnvelopeIcon', label: 'Email', value: '[Insert Company Email]' },
-                { icon: 'PhoneIcon', label: 'Phone', value: '[Insert Telephone Number]' },
-                { icon: 'MapPinIcon', label: 'Address', value: '[Insert Business Address]' },
-                { icon: 'ClockIcon', label: 'Office Hours', value: 'Monday – Friday\n10:00 AM – 6:00 PM' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-start gap-4 p-4 bg-card rounded-xl border border-border">
-                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name={item.icon as Parameters<typeof Icon>[0]['name']} size={18} className="text-accent" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">{item.label}</div>
-                    <div className="text-sm text-foreground font-medium whitespace-pre-line">{item.value}</div>
-                  </div>
+            
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <Icon name="MapPinIcon" size={24} className="text-accent" />
                 </div>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 text-white">
-              <div className="font-bold text-base mb-2">Urgent Staffing Need?</div>
-              <p className="text-white/70 text-sm leading-relaxed mb-4">
-                If you have an immediate staffing requirement, please call us directly during office hours for a faster response.
-              </p>
-              <div className="text-accent font-bold text-sm">[Insert Telephone Number]</div>
+                <div>
+                  <h3 className="font-bold text-foreground mb-1">Office Address</h3>
+                  <p className="text-muted-foreground">{content.officeAddress}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <Icon name="PhoneIcon" size={24} className="text-accent" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground mb-1">Phone Number</h3>
+                  <p className="text-muted-foreground">{content.officePhone}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <Icon name="EnvelopeIcon" size={24} className="text-accent" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-foreground mb-1">Email Address</h3>
+                  <p className="text-muted-foreground">{content.officeEmail}</p>
+                </div>
+              </div>
             </div>
           </div>
 

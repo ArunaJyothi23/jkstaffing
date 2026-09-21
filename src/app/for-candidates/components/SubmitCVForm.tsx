@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function SubmitCVForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -11,6 +12,18 @@ export default function SubmitCVForm() {
     areaOfWork: '', preference: '', experience: '', message: '',
   });
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const [content, setContent] = useState({
+    formTitle: 'Submit Your CV',
+    formText: 'Register your details and upload your CV. We will review your profile and contact you when a suitable opportunity becomes available.',
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'candidates_page', (doc) => {
+      if (doc) setContent(prev => ({ ...prev, ...doc }));
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,9 +43,9 @@ export default function SubmitCVForm() {
       <div className="container max-w-4xl mx-auto px-4 lg:px-8">
         <div className="text-center mb-12">
           <div className="section-label justify-center mb-4">Start Your Journey</div>
-          <h2 className="text-section-title font-extrabold text-primary mb-4">Submit Your CV</h2>
+          <h2 className="text-section-title font-extrabold text-primary mb-4">{content.formTitle}</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Register your details and upload your CV. We will review your profile and contact you when a suitable opportunity becomes available.
+            {content.formText}
           </p>
         </div>
 

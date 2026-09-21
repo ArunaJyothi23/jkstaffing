@@ -1,10 +1,16 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AppImage from '@/components/ui/AppImage';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function ServicesHero() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    heroTitle: 'Our Workforce Services',
+    heroText: 'Flexible staffing and workforce solutions designed around your organisation. From temporary cover to permanent recruitment, security staffing to HR support — we provide end-to-end workforce services across the UK.',
+    heroImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1b79077ab-1767420515885.png',
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -20,7 +26,17 @@ export default function ServicesHero() {
       { threshold: 0.1 }
     );
     if (ref?.current) observer?.observe(ref?.current);
-    return () => observer?.disconnect();
+
+    const unsubscribe = subscribeDocument('site_content', 'services_page', (doc) => {
+      if (doc) {
+        setContent(prev => ({ ...prev, ...doc }));
+      }
+    });
+
+    return () => {
+      observer?.disconnect();
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -32,8 +48,8 @@ export default function ServicesHero() {
       
       <div className="absolute inset-0 z-0">
         <AppImage
-          src="https://img.rocket.new/generatedImages/rocket_gen_img_1b79077ab-1767420515885.png"
-          alt="Professional UK workforce team collaborating in a bright modern corporate environment, diverse professionals"
+          src={content.heroImage}
+          alt={content.heroTitle}
           fill
           priority
           className="object-cover"
@@ -45,10 +61,10 @@ export default function ServicesHero() {
         <div className="max-w-3xl">
           <div className="fade-up section-label text-primary mb-4">What We Offer</div>
           <h1 className="fade-up stagger-1 text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter text-primary mb-6">
-            Our Workforce Services
+            {content.heroTitle}
           </h1>
           <p className="fade-up stagger-2 text-foreground/90 font-medium text-lg leading-relaxed">
-            Flexible staffing and workforce solutions designed around your organisation. From temporary cover to permanent recruitment, security staffing to HR support — we provide end-to-end workforce services across the UK.
+            {content.heroText}
           </p>
         </div>
       </div>
