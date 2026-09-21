@@ -1,10 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function ServicesCTA() {
+  const [content, setContent] = useState({
+    ctaTitle: 'Ready to Discuss Your Requirements?',
+    ctaText: 'Contact our team to discuss which services best fit your business or career needs.',
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'services_page', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          ctaTitle: doc.ctaTitle || prev.ctaTitle,
+          ctaText: doc.ctaText || prev.ctaText,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <section
       className="py-20 relative overflow-hidden"
@@ -18,9 +36,9 @@ export default function ServicesCTA() {
         }}
       />
       <div className="container max-w-4xl mx-auto px-4 lg:px-8 text-center relative z-10">
-        <h2 className="text-display font-extrabold text-white mb-4">Ready to Discuss Your Requirements?</h2>
-        <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto">
-          Contact our team to discuss which services best fit your business or career needs.
+        <h2 className="text-display font-extrabold text-white mb-4">{content.ctaTitle}</h2>
+        <p className="text-white/70 text-lg mb-8 max-w-xl mx-auto whitespace-pre-line">
+          {content.ctaText}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/for-employers" className="btn-primary py-3.5 px-8 justify-center">

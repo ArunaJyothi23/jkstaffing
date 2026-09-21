@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 const checks = [
   'Right-to-work verification',
@@ -18,6 +19,22 @@ const checks = [
 
 export default function ComplianceSection() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    compTitle: 'Our Commitment to Compliance',
+    compText: 'We recognise the importance of responsible recruitment and appropriate candidate verification. Depending on the role and sector, relevant checks may include the following.',
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'homepage', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          compTitle: doc.compTitle || prev.compTitle,
+          compText: doc.compText || prev.compText,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -67,10 +84,10 @@ export default function ComplianceSection() {
           <div className="flex flex-col gap-6">
             <div className="fade-up section-label">Responsible Recruitment</div>
             <h2 className="fade-up stagger-1 text-section-title font-extrabold text-primary">
-              Our Commitment to Compliance
+              {content.compTitle}
             </h2>
             <p className="fade-up stagger-2 text-muted-foreground leading-relaxed">
-              We recognise the importance of responsible recruitment and appropriate candidate verification. Depending on the role and sector, relevant checks may include the following.
+              {content.compText}
             </p>
             <div className="fade-up stagger-3 flex flex-col gap-4">
               {[

@@ -1,20 +1,37 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/ui/AppIcon';
-
-const objectives = [
-  { num: '01', title: 'Connect Employers with Candidates', desc: 'To provide effective recruitment and staffing solutions that meet operational requirements.', icon: 'LinkIcon' },
-  { num: '02', title: 'Support Candidates', desc: 'To help individuals identify employment opportunities that match their skills and experience.', icon: 'UserIcon' },
-  { num: '03', title: 'Maintain Professional Standards', desc: 'To operate transparent and responsible recruitment processes at all times.', icon: 'StarIcon' },
-  { num: '04', title: 'Develop Long-Term Relationships', desc: 'To build lasting relationships with employers, candidates and business partners.', icon: 'HandshakeIcon' as Parameters<typeof Icon>[0]['name'] },
-  { num: '05', title: 'Support Workforce Flexibility', desc: 'To help organisations respond to changing staffing requirements quickly and efficiently.', icon: 'ArrowPathIcon' },
-  { num: '06', title: 'Promote Equal Opportunity', desc: 'To provide fair and inclusive recruitment processes accessible to all candidates.', icon: 'ScaleIcon' },
-  { num: '07', title: 'Maintain Appropriate Compliance', desc: 'To undertake relevant checks and processes according to the role, sector and applicable requirements.', icon: 'ClipboardDocumentCheckIcon' },
-];
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function ObjectivesSection() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    objTitle: 'Our Key Objectives',
+    objText: 'Seven core commitments that guide how we operate and serve our clients and candidates.',
+    objectivesList: [
+      { num: '01', title: 'Connect Employers with Candidates', text: 'To provide effective recruitment and staffing solutions that meet operational requirements.', icon: 'LinkIcon' },
+      { num: '02', title: 'Support Candidates', text: 'To help individuals identify employment opportunities that match their skills and experience.', icon: 'UserIcon' },
+      { num: '03', title: 'Maintain Professional Standards', text: 'To operate transparent and responsible recruitment processes at all times.', icon: 'StarIcon' },
+      { num: '04', title: 'Develop Long-Term Relationships', text: 'To build lasting relationships with employers, candidates and business partners.', icon: 'HandshakeIcon' },
+      { num: '05', title: 'Support Workforce Flexibility', text: 'To help organisations respond to changing staffing requirements quickly and efficiently.', icon: 'ArrowPathIcon' },
+      { num: '06', title: 'Promote Equal Opportunity', text: 'To provide fair and inclusive recruitment processes accessible to all candidates.', icon: 'ScaleIcon' },
+      { num: '07', title: 'Maintain Appropriate Compliance', text: 'To undertake relevant checks and processes according to the role, sector and applicable requirements.', icon: 'ClipboardDocumentCheckIcon' },
+    ]
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'homepage', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          objTitle: doc.objTitle || prev.objTitle,
+          objText: doc.objText || prev.objText,
+          objectivesList: doc.objectivesList || prev.objectivesList,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,57 +50,66 @@ export default function ObjectivesSection() {
     return () => observer.disconnect();
   }, []);
 
+  // Ensure last item spans full width
+  const items = content.objectivesList || [];
+  const initialItems = items.slice(0, Math.max(0, items.length - 1));
+  const lastItem = items.length > 0 ? items[items.length - 1] : null;
+
   return (
     <section ref={ref} className="section-padding bg-muted" aria-label="Our key objectives">
       <div className="container max-w-7xl mx-auto px-4 lg:px-8">
         <div className="text-center mb-14 fade-up">
           <div className="section-label justify-center mb-4">What We Stand For</div>
-          <h2 className="text-section-title font-extrabold text-primary mb-4">Our Key Objectives</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Seven core commitments that guide how we operate and serve our clients and candidates.
+          <h2 className="text-section-title font-extrabold text-primary mb-4">{content.objTitle}</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto whitespace-pre-line">
+            {content.objText}
           </p>
         </div>
 
-        {/* BENTO GRID: 7 cards */}
-        {/* Row 1: [col-1: Obj1 cs-1] [col-2: Obj2 cs-1] [col-3: Obj3 cs-1] */}
-        {/* Row 2: [col-1: Obj4 cs-1] [col-2: Obj5 cs-1] [col-3: Obj6 cs-1] */}
-        {/* Row 3: [col-1: Obj7 cs-3 (full)] */}
+        {/* BENTO GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {objectives.slice(0, 6).map((obj, i) => (
+          {initialItems.map((obj: any, i: number) => (
             <div
-              key={obj.num}
+              key={i}
               className={`fade-up stagger-${Math.min(i + 1, 6)} bg-card rounded-2xl p-6 border border-border card-lift shadow-card group`}
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-                    <span className="text-accent font-extrabold text-sm font-mono">{obj.num}</span>
+                    <span className="text-accent font-extrabold text-sm font-mono">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-primary mb-2">{obj.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{obj.desc}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{obj.text}</p>
                 </div>
               </div>
             </div>
           ))}
+
           {/* Last card spans full width */}
-          <div className="fade-up stagger-6 bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 border border-primary/20 shadow-card lg:col-span-3">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
-                  <span className="text-white font-extrabold text-sm font-mono">07</span>
+          {lastItem && (
+            <div className="fade-up stagger-6 bg-gradient-to-r from-primary to-secondary rounded-2xl p-6 border border-primary/20 shadow-card lg:col-span-3">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+                    <span className="text-white font-extrabold text-sm font-mono">
+                      {String(items.length).padStart(2, '0')}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-white mb-2">{lastItem.title}</h3>
+                  <p className="text-sm text-white/70 leading-relaxed max-w-2xl">{lastItem.text}</p>
+                </div>
+                <div className="ml-auto hidden lg:block">
+                  <Icon name={lastItem.icon as Parameters<typeof Icon>[0]['name'] || "ClipboardDocumentCheckIcon"} size={40} className="text-accent/30" />
                 </div>
               </div>
-              <div>
-                <h3 className="font-bold text-base text-white mb-2">{objectives[6].title}</h3>
-                <p className="text-sm text-white/70 leading-relaxed max-w-2xl">{objectives[6].desc}</p>
-              </div>
-              <div className="ml-auto hidden lg:block">
-                <Icon name="ClipboardDocumentCheckIcon" size={40} className="text-accent/30" />
-              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </section>

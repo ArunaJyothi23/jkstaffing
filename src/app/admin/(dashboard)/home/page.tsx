@@ -92,6 +92,7 @@ export default function HomeContentPage() {
     // Core Values
     valTitle: 'Our Core Values',
     valText: 'The principles that guide everything we do.',
+    valAimText: 'To become a trusted staffing and workforce services partner for employers while creating meaningful employment opportunities for candidates. We seek to understand the needs of organisations, identify appropriate talent and provide responsive workforce solutions that support operational continuity and long-term development.',
     coreValuesList: [
       { title: 'Integrity', text: 'We operate with complete transparency and honesty in all our dealings.', icon: 'ShieldCheckIcon' },
       { title: 'Excellence', text: 'We strive for the highest quality in our service delivery.', icon: 'StarIcon' },
@@ -104,8 +105,20 @@ export default function HomeContentPage() {
     compText: 'We maintain the highest standards of regulatory compliance and operational excellence.',
     compImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_15caab975-1776993510521.png',
 
+    // Services
+    servTitle: 'Our Workforce Services',
+    servText: 'Flexible staffing and workforce solutions designed around your organisation.',
+    servicesList: [
+      { title: 'Staffing & Recruitment', desc: 'We provide full end-to-end recruitment solutions.', icon: 'UserGroupIcon', offerings: 'Candidate sourcing, CV screening, Background checks' },
+      { title: 'Temporary Staffing', desc: 'Quick, reliable workforce support for spikes in demand.', icon: 'ClockIcon', offerings: 'Peak season cover, Event staffing' },
+      { title: 'Permanent Recruitment', desc: 'Finding long-term talent for your technical capability.', icon: 'BriefcaseIcon', offerings: 'Role requirement analysis, Targeted candidate searches' },
+      { title: 'Security Staffing', desc: 'Qualified security personnel to protect physical sites.', icon: 'ShieldCheckIcon', offerings: 'Security officers, Door supervisors', note: 'All security staff undergo strict vetting.' },
+      { title: 'Workforce Management', desc: 'Assisting businesses in managing day-to-day logistics.', icon: 'ChartBarIcon', offerings: 'Shift scheduling, Attendance tracking' },
+      { title: 'HR Support', desc: 'Practical administrative and human resources assistance.', icon: 'DocumentTextIcon', offerings: 'Recruitment administration, Personnel documentation' }
+    ],
+
     // Objectives
-    objTitle: 'Our Strategic Objectives',
+    objTitle: 'Our Key Objectives',
     objText: 'What we aim to achieve for our clients and candidates.',
     objectivesList: [
       { title: 'Quality Placements', text: 'Ensuring the perfect match between candidate skills and employer requirements.', icon: 'CheckBadgeIcon' },
@@ -431,14 +444,20 @@ export default function HomeContentPage() {
       {/* Core Values */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-4xl mb-6">
         <h2 className="text-lg font-bold text-gray-800 mb-4">Core Values</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-            <input type="text" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none" value={content.valTitle} onChange={e => setContent({...content, valTitle: e.target.value})} />
+        <div className="grid grid-cols-1 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input type="text" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none" value={content.valTitle} onChange={e => setContent({...content, valTitle: e.target.value})} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea rows={2} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none" value={content.valText} onChange={e => setContent({...content, valText: e.target.value})} />
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea rows={2} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none" value={content.valText} onChange={e => setContent({...content, valText: e.target.value})} />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Our Aim Text</label>
+            <textarea rows={3} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none" value={content.valAimText} onChange={e => setContent({...content, valAimText: e.target.value})} />
           </div>
         </div>
 
@@ -455,6 +474,67 @@ export default function HomeContentPage() {
             </div>
           ))}
           <button type="button" onClick={() => addArrayItem('coreValuesList', { title: 'New Value', text: 'Value Description', icon: 'StarIcon' })} className="text-sm text-[#FF6B2C] font-medium">+ Add Value</button>
+        </div>
+      </div>
+
+      {/* Services Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 max-w-4xl mb-6">
+        <h2 className="text-lg font-bold text-gray-800 mb-4">Services</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" className="w-full border border-gray-200 rounded-lg p-2.5 outline-none" value={content.servTitle} onChange={e => setContent({...content, servTitle: e.target.value})} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea rows={2} className="w-full border border-gray-200 rounded-lg p-2.5 outline-none" value={content.servText} onChange={e => setContent({...content, servText: e.target.value})} />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <label className="block text-sm font-bold text-gray-800 mb-2 border-b pb-2">Services List</label>
+          {content.servicesList.map((item: any, index: number) => (
+            <div key={index} className="p-4 border border-gray-200 rounded-lg bg-gray-50 relative">
+              <button 
+                type="button"
+                onClick={() => removeArrayItem('servicesList', index)}
+                className="absolute top-2 right-2 text-red-500 hover:bg-red-50 p-1 rounded"
+              >
+                <Icon name="TrashIcon" size={16} />
+              </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Title</label>
+                  <input type="text" className="w-full border border-gray-200 rounded p-2 text-sm outline-none bg-white" value={item.title} onChange={e => updateArrayItem('servicesList', index, 'title', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Icon Name</label>
+                  <input type="text" className="w-full border border-gray-200 rounded p-2 text-sm outline-none bg-white" value={item.icon} onChange={e => updateArrayItem('servicesList', index, 'icon', e.target.value)} />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs text-gray-500 mb-1">Description</label>
+                  <textarea rows={2} className="w-full border border-gray-200 rounded p-2 text-sm outline-none bg-white" value={item.desc} onChange={e => updateArrayItem('servicesList', index, 'desc', e.target.value)} />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs text-gray-500 mb-1">Offerings (comma-separated)</label>
+                  <input type="text" className="w-full border border-gray-200 rounded p-2 text-sm outline-none bg-white" value={item.offerings} onChange={e => updateArrayItem('servicesList', index, 'offerings', e.target.value)} />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs text-gray-500 mb-1">Note (Optional)</label>
+                  <input type="text" className="w-full border border-gray-200 rounded p-2 text-sm outline-none bg-white" value={item.note || ''} onChange={e => updateArrayItem('servicesList', index, 'note', e.target.value)} />
+                </div>
+              </div>
+            </div>
+          ))}
+          {content.servicesList.length < 6 && (
+            <button
+              type="button"
+              onClick={() => addArrayItem('servicesList', { title: 'New Service', desc: '', icon: 'CheckIcon', offerings: '' })}
+              className="text-sm text-[#FF6B2C] font-medium flex items-center gap-1"
+            >
+              <Icon name="PlusIcon" size={16} /> Add Service
+            </button>
+          )}
         </div>
       </div>
 

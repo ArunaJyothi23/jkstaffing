@@ -48,22 +48,21 @@ export default function AdminLoginPage() {
               </Link>
             </div>
 
-            <h1 className="text-base font-bold text-[#0D2353] mb-1.5">JK Staffing & Services Management Ltd</h1>
-            <p className="text-gray-400 text-xs leading-relaxed mb-5">
-              The secure portal for managing your enterprise content and operations.
-            </p>
-
             {/* Logo Image */}
-            <div className="rounded-lg overflow-hidden shadow-sm border border-gray-100 mx-auto max-w-[220px]">
+            <div className="rounded-lg overflow-hidden mx-auto max-w-[220px] mb-4">
               <Image
                 src="/assets/images/logo.jpg"
                 alt="JK Staffing Logo"
                 width={220}
                 height={150}
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain mix-blend-multiply"
                 priority
               />
             </div>
+            
+            <p className="text-gray-400 text-xs leading-relaxed mb-5">
+              The secure portal for managing your enterprise content and operations.
+            </p>
           </div>
         </div>
 

@@ -1,11 +1,28 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function HomeCTA() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    ctaTitle: 'Ready to Transform Your Workforce?',
+    ctaText: 'Partner with JK Staffing & Services Management Ltd today.',
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'homepage', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          ctaTitle: doc.ctaTitle || prev.ctaTitle,
+          ctaText: doc.ctaText || prev.ctaText,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -42,10 +59,10 @@ export default function HomeCTA() {
       <div className="container max-w-4xl mx-auto px-4 lg:px-8 text-center relative z-10">
         <div className="fade-up section-label justify-center text-white/60 mb-4">Get Started Today</div>
         <h2 className="fade-up stagger-1 text-display font-extrabold text-white mb-6">
-          Ready to Find the Right Staffing Solution?
+          {content.ctaTitle}
         </h2>
         <p className="fade-up stagger-2 text-white/70 text-lg leading-relaxed mb-10 max-w-2xl mx-auto">
-          Whether you are an employer looking for reliable staff or a candidate seeking your next opportunity, JK Staffing is here to help.
+          {content.ctaText}
         </p>
         <div className="fade-up stagger-3 flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/for-employers" className="btn-primary text-base py-3.5 px-8 justify-center">

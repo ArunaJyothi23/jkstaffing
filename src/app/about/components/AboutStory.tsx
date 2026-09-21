@@ -11,7 +11,9 @@ export default function AboutStory() {
     storyTitle: 'A UK Workforce Agency Built on Trust',
     storyText1: 'JK Staffing & Services Management Ltd provides human resources management, staffing solutions, and private security activities across the UK. We bridge the gap between businesses seeking dependable staff and individuals seeking meaningful work.',
     storyText2: 'Since our establishment in April 2021, we have built our reputation on responsiveness, compliance, and genuine understanding of our clients and candidates needs.',
-    storyImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1d516d798-1768437649458.png'
+    storyImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1d516d798-1768437649458.png',
+    vision: 'To be a trusted recruitment and workforce partner known for integrity, high compliance standards, and strong long-term business relationships.',
+    mission: 'To deliver flexible, high-quality recruitment and HR support that helps employers maintain operational success while empowering job seekers to achieve their employment goals.',
   });
 
   useEffect(() => {
@@ -65,8 +67,8 @@ export default function AboutStory() {
                   </div>
                   <div className="font-bold text-sm text-primary">Our Vision</div>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  To be a trusted recruitment and workforce partner known for integrity, high compliance standards, and strong long-term business relationships.
+                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {content.vision}
                 </p>
               </div>
               <div className="bg-card rounded-xl p-5 border border-border shadow-card">
@@ -76,8 +78,8 @@ export default function AboutStory() {
                   </div>
                   <div className="font-bold text-sm text-primary">Our Mission</div>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  To deliver flexible, high-quality recruitment and HR support that helps employers maintain operational success while empowering job seekers to achieve their employment goals.
+                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {content.mission}
                 </p>
               </div>
             </div>

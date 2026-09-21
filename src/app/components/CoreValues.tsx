@@ -1,41 +1,59 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
-const values = [
-  {
-    icon: 'HandRaisedIcon',
-    title: 'Integrity',
-    desc: 'Upfront, clear and honest communication with clients and candidates throughout every interaction.',
-    color: 'bg-primary/8',
-    iconColor: 'text-primary',
-  },
-  {
-    icon: 'StarIcon',
-    title: 'Quality',
-    desc: 'Matching candidates based on long-term suitability rather than short-term volume or quick placements.',
-    color: 'bg-accent/8',
-    iconColor: 'text-accent',
-  },
-  {
-    icon: 'ShieldCheckIcon',
-    title: 'Responsibility',
-    desc: 'Strictly adhering to compliance, legal checks and workplace standards on every engagement.',
-    color: 'bg-secondary/8',
-    iconColor: 'text-secondary',
-  },
-  {
-    icon: 'HeartIcon',
-    title: 'Respect & Inclusion',
-    desc: 'Promoting fair, accessible and inclusive recruitment practices for all candidates regardless of background.',
-    color: 'bg-primary/5',
-    iconColor: 'text-primary',
-  },
+const COLORS = [
+  { bg: 'bg-primary/8', text: 'text-primary' },
+  { bg: 'bg-accent/8', text: 'text-accent' },
+  { bg: 'bg-secondary/8', text: 'text-secondary' },
+  { bg: 'bg-primary/5', text: 'text-primary' },
 ];
 
 export default function CoreValues() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    valTitle: 'Our Core Values',
+    valText: 'These four values form the foundation of everything we do at JK Staffing. They guide our decisions, shape our relationships, and define the standard of service we deliver.',
+    valAimText: 'To become a trusted staffing and workforce services partner for employers while creating meaningful employment opportunities for candidates. We seek to understand the needs of organisations, identify appropriate talent and provide responsive workforce solutions that support operational continuity and long-term development.',
+    coreValuesList: [
+      {
+        icon: 'HandRaisedIcon',
+        title: 'Integrity',
+        text: 'Upfront, clear and honest communication with clients and candidates throughout every interaction.',
+      },
+      {
+        icon: 'StarIcon',
+        title: 'Quality',
+        text: 'Matching candidates based on long-term suitability rather than short-term volume or quick placements.',
+      },
+      {
+        icon: 'ShieldCheckIcon',
+        title: 'Responsibility',
+        text: 'Strictly adhering to compliance, legal checks and workplace standards on every engagement.',
+      },
+      {
+        icon: 'HeartIcon',
+        title: 'Respect & Inclusion',
+        text: 'Promoting fair, accessible and inclusive recruitment practices for all candidates regardless of background.',
+      },
+    ]
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'homepage', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          valTitle: doc.valTitle || prev.valTitle,
+          valText: doc.valText || prev.valText,
+          valAimText: doc.valAimText || prev.valAimText,
+          coreValuesList: doc.coreValuesList || prev.coreValuesList,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -60,31 +78,34 @@ export default function CoreValues() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
             <div className="fade-up section-label mb-4">What Drives Us</div>
-            <h2 className="fade-up stagger-1 text-section-title font-extrabold text-primary mb-6">Our Core Values</h2>
-            <p className="fade-up stagger-2 text-muted-foreground leading-relaxed mb-8">
-              These four values form the foundation of everything we do at JK Staffing. They guide our decisions, shape our relationships, and define the standard of service we deliver.
+            <h2 className="fade-up stagger-1 text-section-title font-extrabold text-primary mb-6">{content.valTitle}</h2>
+            <p className="fade-up stagger-2 text-muted-foreground leading-relaxed mb-8 whitespace-pre-line">
+              {content.valText}
             </p>
             <div className="fade-up stagger-3 bg-gradient-to-br from-primary to-secondary rounded-2xl p-6 text-white">
               <div className="text-4xl font-extrabold mb-1 text-accent">Our Aim</div>
-              <p className="text-white/80 text-sm leading-relaxed">
-                To become a trusted staffing and workforce services partner for employers while creating meaningful employment opportunities for candidates. We seek to understand the needs of organisations, identify appropriate talent and provide responsive workforce solutions that support operational continuity and long-term development.
+              <p className="text-white/80 text-sm leading-relaxed whitespace-pre-line">
+                {content.valAimText}
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {values.map((v, i) => (
-              <div
-                key={v.title}
-                className={`fade-up stagger-${i + 1} bg-card rounded-2xl p-6 border border-border card-lift shadow-card group`}
-              >
-                <div className={`w-12 h-12 rounded-xl ${v.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon name={v.icon as Parameters<typeof Icon>[0]['name']} size={22} className={v.iconColor} />
+            {content.coreValuesList?.map((v: any, i: number) => {
+              const colorTheme = COLORS[i % COLORS.length];
+              return (
+                <div
+                  key={i}
+                  className={`fade-up stagger-${i + 1} bg-card rounded-2xl p-6 border border-border card-lift shadow-card group`}
+                >
+                  <div className={`w-12 h-12 rounded-xl ${colorTheme.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon name={v.icon as Parameters<typeof Icon>[0]['name']} size={22} className={colorTheme.text} />
+                  </div>
+                  <h3 className="font-bold text-base text-primary mb-2">{v.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{v.text}</p>
                 </div>
-                <h3 className="font-bold text-base text-primary mb-2">{v.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

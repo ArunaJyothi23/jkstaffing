@@ -1,12 +1,41 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
 import AppImage from '@/components/ui/AppImage';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function AudienceCTA() {
   const ref = useRef<HTMLDivElement>(null);
+  const [content, setContent] = useState({
+    empTitle: 'Need Reliable Staff?',
+    empText: 'Whether you need short-term cover, permanent recruitment, specialist security personnel or workforce coordination, we can help you find the right staffing solution.',
+    empImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_111288e54-1776866345849.png',
+    empChecklist: ['Temporary & Permanent Roles', 'Security Personnel', 'Workforce Coordination', 'Fast Placement'],
+    candTitle: 'Looking for Your Next Opportunity?',
+    candText: 'Explore employment opportunities that match your skills, experience and career goals across multiple sectors throughout the UK.',
+    candImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_11c2c4670-1778965269126.png',
+    candChecklist: ['Temporary & Permanent Roles', 'Multiple Sectors', 'Career Guidance', 'Fast Application'],
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'homepage', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          empTitle: doc.empTitle || prev.empTitle,
+          empText: doc.empText || prev.empText,
+          empImage: doc.empImage || prev.empImage,
+          empChecklist: doc.empChecklist || prev.empChecklist,
+          candTitle: doc.candTitle || prev.candTitle,
+          candText: doc.candText || prev.candText,
+          candImage: doc.candImage || prev.candImage,
+          candChecklist: doc.candChecklist || prev.candChecklist,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,7 +62,7 @@ export default function AudienceCTA() {
           <div className="fade-up relative bg-primary rounded-3xl overflow-hidden p-8 lg:p-10 flex flex-col justify-between min-h-80 shine-card">
             <div className="absolute inset-0 z-0">
               <AppImage
-                src="https://img.rocket.new/generatedImages/rocket_gen_img_111288e54-1776866345849.png"
+                src={content.empImage}
                 alt="Business executives in a modern UK office reviewing staffing requirements, professional setting, cool blue tones"
                 fill
                 className="object-cover object-center"
@@ -47,14 +76,14 @@ export default function AudienceCTA() {
                   For Employers
                 </div>
                 <h2 className="text-display font-black tracking-tight text-white">
-                  Need Reliable Staff?
+                  {content.empTitle}
                 </h2>
                 <p className="text-white/70 text-base leading-relaxed">
-                  Whether you need short-term cover, permanent recruitment, specialist security personnel or workforce coordination, we can help you find the right staffing solution.
+                  {content.empText}
                 </p>
                 <ul className="flex flex-col gap-2 mt-2">
-                  {['Temporary & Permanent Roles', 'Security Personnel', 'Workforce Coordination', 'Fast Placement']?.map((item) =>
-                  <li key={item} className="flex items-center gap-2 text-white/70 text-sm">
+                  {content.empChecklist?.map((item: string, idx: number) =>
+                  <li key={idx} className="flex items-center gap-2 text-white/70 text-sm">
                       <Icon name="CheckCircleIcon" size={16} className="text-accent flex-shrink-0" />
                       {item}
                     </li>
@@ -72,7 +101,7 @@ export default function AudienceCTA() {
           <div className="fade-up stagger-2 relative bg-secondary rounded-3xl overflow-hidden p-8 lg:p-10 flex flex-col justify-between min-h-80 shine-card">
             <div className="absolute inset-0 z-0">
               <AppImage
-                src="https://img.rocket.new/generatedImages/rocket_gen_img_11c2c4670-1778965269126.png"
+                src={content.candImage}
                 alt="Professional candidate in a job interview, confident expression, bright office environment"
                 fill
                 className="object-cover object-center"
@@ -86,14 +115,14 @@ export default function AudienceCTA() {
                   For Candidates
                 </div>
                 <h2 className="text-display font-black tracking-tight text-white">
-                  Looking for Your Next Opportunity?
+                  {content.candTitle}
                 </h2>
                 <p className="text-white/70 text-base leading-relaxed">
-                  Explore employment opportunities that match your skills, experience and career goals across multiple sectors throughout the UK.
+                  {content.candText}
                 </p>
                 <ul className="flex flex-col gap-2 mt-2">
-                  {['Temporary & Permanent Roles', 'Multiple Sectors', 'Career Guidance', 'Fast Application']?.map((item) =>
-                  <li key={item} className="flex items-center gap-2 text-white/70 text-sm">
+                  {content.candChecklist?.map((item: string, idx: number) =>
+                  <li key={idx} className="flex items-center gap-2 text-white/70 text-sm">
                       <Icon name="CheckCircleIcon" size={16} className="text-accent flex-shrink-0" />
                       {item}
                     </li>
@@ -108,6 +137,6 @@ export default function AudienceCTA() {
           </div>
         </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }

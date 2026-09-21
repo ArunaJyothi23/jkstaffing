@@ -1,21 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '@/components/ui/AppIcon';
-
-const categories = [
-  { icon: 'ShieldCheckIcon', title: 'Security & Facilities', count: 'Multiple roles available' },
-  { icon: 'TruckIcon', title: 'Logistics & Warehousing', count: 'Multiple roles available' },
-  { icon: 'SparklesIcon', title: 'Hospitality & Catering', count: 'Multiple roles available' },
-  { icon: 'HeartIcon', title: 'Healthcare & Social Care', count: 'Multiple roles available' },
-  { icon: 'BuildingOfficeIcon', title: 'Facilities & Cleaning', count: 'Multiple roles available' },
-  { icon: 'ComputerDesktopIcon', title: 'Office & Administration', count: 'Multiple roles available' },
-];
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function JobSearch() {
   const [keyword, setKeyword] = useState('');
   const [location, setLocation] = useState('');
   const [type, setType] = useState('');
+
+  const [content, setContent] = useState({
+    categories: [
+      { icon: 'ShieldCheckIcon', title: 'Security & Facilities', count: 'Multiple roles available' },
+      { icon: 'TruckIcon', title: 'Logistics & Warehousing', count: 'Multiple roles available' },
+      { icon: 'SparklesIcon', title: 'Hospitality & Catering', count: 'Multiple roles available' },
+      { icon: 'HeartIcon', title: 'Healthcare & Social Care', count: 'Multiple roles available' },
+      { icon: 'BuildingOfficeIcon', title: 'Facilities & Cleaning', count: 'Multiple roles available' },
+      { icon: 'ComputerDesktopIcon', title: 'Office & Administration', count: 'Multiple roles available' },
+    ]
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'candidates_page', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          categories: doc.categories || prev.categories,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +93,7 @@ export default function JobSearch() {
 
         {/* Categories */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {categories.map((cat) => (
+          {content.categories?.map((cat: any) => (
             <a
               key={cat.title}
               href="#submit-cv"

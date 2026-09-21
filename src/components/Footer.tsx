@@ -1,9 +1,31 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppLogo from '@/components/ui/AppLogo';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function Footer() {
+  const [content, setContent] = useState({
+    footerEmail: '[Insert Company Email]',
+    footerHours: 'Mon–Fri: 10:00–18:00',
+    footerDescription: 'Connecting businesses with reliable people and candidates with great opportunities across the UK.',
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'global', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          footerEmail: doc.footerEmail !== undefined ? doc.footerEmail : prev.footerEmail,
+          footerHours: doc.footerHours !== undefined ? doc.footerHours : prev.footerHours,
+          footerDescription: doc.footerDescription !== undefined ? doc.footerDescription : prev.footerDescription,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <footer className="bg-primary text-white/90 pt-16 pb-8 border-t border-white/10">
       <div className="container max-w-7xl mx-auto px-4 lg:px-8">
@@ -17,11 +39,11 @@ export default function Footer() {
               />
               <div>
                 <div className="font-bold text-white text-base leading-tight">JK Staffing</div>
-                <div className="text-white/60 text-xs">& Services Management Ltd</div>
+                <div className="text-white/60 text-xs">&amp; Services Management Ltd</div>
               </div>
             </div>
             <p className="text-white/60 text-sm leading-relaxed max-w-xs mb-5">
-              Connecting businesses with reliable people and candidates with great opportunities across the UK.
+              {content.footerDescription}
             </p>
             <p className="text-white/40 text-xs">Established 16 April 2021</p>
           </div>
@@ -83,11 +105,11 @@ export default function Footer() {
             <div className="flex flex-col gap-2 text-sm text-white/60">
               <div className="flex items-center gap-2">
                 <Icon name="ClockIcon" size={14} className="text-accent flex-shrink-0" />
-                <span>Mon–Fri: 10:00–18:00</span>
+                <span>{content.footerHours}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Icon name="EnvelopeIcon" size={14} className="text-accent flex-shrink-0" />
-                <span>[Insert Company Email]</span>
+                <span>{content.footerEmail}</span>
               </div>
             </div>
           </div>
@@ -95,7 +117,7 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8">
           <p className="text-white/40 text-sm text-center sm:text-left">
-            © {new Date()?.getFullYear()} JK Staffing & Services Management Ltd. All Rights Reserved.
+            © {new Date()?.getFullYear()} JK Staffing &amp; Services Management Ltd. All Rights Reserved.
           </p>
           <div className="flex items-center gap-5">
             {['Privacy Policy', 'Cookie Policy', 'Terms & Conditions']?.map((item) => (

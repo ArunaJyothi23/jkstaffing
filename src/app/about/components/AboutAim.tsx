@@ -1,10 +1,25 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/ui/AppIcon';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function AboutAim() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    aim: 'To become a trusted staffing and workforce services partner for employers while creating meaningful employment opportunities for candidates. We seek to understand the needs of organisations, identify appropriate talent and provide responsive workforce solutions that support operational continuity and long-term development.'
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'about_page', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          aim: doc.aim || prev.aim,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -23,6 +38,11 @@ export default function AboutAim() {
     return () => observer?.disconnect();
   }, []);
 
+  // Split aim into first sentence and the rest
+  const firstPeriodIdx = content.aim.indexOf('.');
+  const aimQuote = firstPeriodIdx !== -1 ? content.aim.substring(0, firstPeriodIdx + 1) : content.aim;
+  const aimRest = firstPeriodIdx !== -1 ? content.aim.substring(firstPeriodIdx + 1).trim() : '';
+
   return (
     <section ref={ref} className="py-20 bg-muted overflow-hidden" aria-label="Our aim">
       <div className="container max-w-7xl mx-auto px-4 lg:px-8">
@@ -39,11 +59,13 @@ export default function AboutAim() {
               <div className="relative z-10">
                 <div className="w-12 h-1 bg-accent rounded-full mb-6" />
                 <p className="text-white text-lg lg:text-xl leading-relaxed font-medium mb-6">
-                  &quot;Our aim is to become a trusted staffing and workforce services partner for employers while creating meaningful employment opportunities for candidates.&quot;
+                  &quot;{aimQuote}&quot;
                 </p>
-                <p className="text-white/70 leading-relaxed">
-                  We seek to understand the needs of organisations, identify appropriate talent and provide responsive workforce solutions that support operational continuity and long-term development.
-                </p>
+                {aimRest && (
+                  <p className="text-white/70 leading-relaxed">
+                    {aimRest}
+                  </p>
+                )}
               </div>
             </div>
           </div>

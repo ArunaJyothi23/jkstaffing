@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
 import AppImage from '@/components/ui/AppImage';
+import { subscribeDocument } from '@/lib/firebase/db';
 
 const stats = [
 { value: 2021, suffix: '', label: 'Year Established', prefix: '' },
@@ -62,6 +63,29 @@ export default function AboutPreview() {
     return () => observer.disconnect();
   }, []);
 
+  const [content, setContent] = useState({
+    aboutTitle: 'People. Service. Opportunity.',
+    aboutDescription: 'JK Staffing & Services Management Ltd provides human resources management, staffing solutions, and private security activities across the UK. We bridge the gap between businesses seeking dependable staff and individuals seeking meaningful work.',
+    aboutVision: 'To be a trusted recruitment and workforce partner known for integrity, high compliance standards, and strong long-term business relationships.',
+    aboutMission: 'To deliver flexible, high-quality recruitment and HR support that helps employers maintain operational success while empowering job seekers.',
+    aboutImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1a1c35946-1769214275939.png',
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'global', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          aboutTitle: doc.aboutTitle || prev.aboutTitle,
+          aboutDescription: doc.aboutDescription || prev.aboutDescription,
+          aboutVision: doc.aboutVision || prev.aboutVision,
+          aboutMission: doc.aboutMission || prev.aboutMission,
+          aboutImage: doc.aboutImage || prev.aboutImage,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <section ref={ref} className="section-padding bg-muted overflow-hidden" aria-label="About JK Staffing">
       <div className="container max-w-7xl mx-auto px-4 lg:px-8">
@@ -70,7 +94,7 @@ export default function AboutPreview() {
           <div className="fade-up relative">
             <div className="relative rounded-3xl overflow-hidden aspect-[4/3] shadow-card-hover">
               <AppImage
-                src="https://img.rocket.new/generatedImages/rocket_gen_img_1a1c35946-1769214275939.png"
+                src={content.aboutImage}
                 alt="Professional UK staffing team in a bright modern office, collaborative discussion, diverse group"
                 fill
                 className="object-cover"
@@ -93,19 +117,19 @@ export default function AboutPreview() {
           <div className="flex flex-col gap-6">
             <div className="fade-up stagger-1 section-label">About Us</div>
             <h2 className="fade-up stagger-2 text-section-title font-extrabold text-primary">
-              People. Service. Opportunity.
+              {content.aboutTitle}
             </h2>
-            <p className="fade-up stagger-3 text-muted-foreground leading-relaxed">
-              JK Staffing & Services Management Ltd provides human resources management, staffing solutions, and private security activities across the UK. We bridge the gap between businesses seeking dependable staff and individuals seeking meaningful work.
+            <p className="fade-up stagger-3 text-muted-foreground leading-relaxed whitespace-pre-line">
+              {content.aboutDescription}
             </p>
             <div className="fade-up stagger-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-card rounded-xl p-5 border border-border">
                 <div className="font-bold text-secondary mb-1 text-sm">Our Vision</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">To be a trusted recruitment and workforce partner known for integrity, high compliance standards, and strong long-term business relationships.</p>
+                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">{content.aboutVision}</p>
               </div>
               <div className="bg-card rounded-xl p-5 border border-border">
                 <div className="font-bold text-secondary mb-1 text-sm">Our Mission</div>
-                <p className="text-xs text-muted-foreground leading-relaxed">To deliver flexible, high-quality recruitment and HR support that helps employers maintain operational success while empowering job seekers.</p>
+                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">{content.aboutMission}</p>
               </div>
             </div>
             <div className="fade-up stagger-5">

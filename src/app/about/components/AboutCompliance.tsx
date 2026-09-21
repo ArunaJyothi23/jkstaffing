@@ -1,24 +1,47 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
-
-const checks = [
-  'Right-to-work verification',
-  'Identity verification',
-  'References',
-  'Qualification verification',
-  'Licence verification',
-  'DBS checks where applicable',
-  'SIA licence verification where applicable',
-  'Sector-specific checks',
-  'Employment history',
-  'Training/certification checks',
-];
+import { subscribeDocument } from '@/lib/firebase/db';
 
 export default function AboutCompliance() {
   const ref = useRef<HTMLElement>(null);
+  const [content, setContent] = useState({
+    compTitle: 'Our Commitment to Compliance',
+    compText: 'We recognise the importance of responsible recruitment and appropriate candidate verification. Depending on the role and sector, relevant checks may include the following.',
+    compFeatures: [
+      { icon: 'ShieldCheckIcon', title: 'Role-Specific Verification', desc: 'All checks are tailored to the specific requirements of each role and sector.' },
+      { icon: 'DocumentMagnifyingGlassIcon', title: 'Thorough Screening', desc: 'We take screening seriously to ensure suitable candidate-employer matches are made.' },
+      { icon: 'ScaleIcon', title: 'Legal Compliance', desc: 'All processes are conducted in accordance with applicable UK employment law and regulations.' },
+    ],
+    compChecks: [
+      'Right-to-work verification',
+      'Identity verification',
+      'References',
+      'Qualification verification',
+      'Licence verification',
+      'DBS checks where applicable',
+      'SIA licence verification where applicable',
+      'Sector-specific checks',
+      'Employment history',
+      'Training/certification checks',
+    ]
+  });
+
+  useEffect(() => {
+    const unsubscribe = subscribeDocument('site_content', 'about_page', (doc) => {
+      if (doc) {
+        setContent(prev => ({
+          compTitle: doc.compTitle || prev.compTitle,
+          compText: doc.compText || prev.compText,
+          compFeatures: doc.compFeatures || prev.compFeatures,
+          compChecks: doc.compChecks || prev.compChecks,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -44,17 +67,13 @@ export default function AboutCompliance() {
           <div className="flex flex-col gap-6">
             <div className="fade-up section-label">Responsible Recruitment</div>
             <h2 className="fade-up stagger-1 text-section-title font-extrabold text-primary">
-              Our Commitment to Compliance
+              {content.compTitle}
             </h2>
-            <p className="fade-up stagger-2 text-muted-foreground leading-relaxed">
-              We recognise the importance of responsible recruitment and appropriate candidate verification. Depending on the role and sector, relevant checks may include the following.
+            <p className="fade-up stagger-2 text-muted-foreground leading-relaxed whitespace-pre-line">
+              {content.compText}
             </p>
             <div className="fade-up stagger-3 flex flex-col gap-4">
-              {[
-                { icon: 'ShieldCheckIcon', title: 'Role-Specific Verification', desc: 'All checks are tailored to the specific requirements of each role and sector.' },
-                { icon: 'DocumentMagnifyingGlassIcon', title: 'Thorough Screening', desc: 'We take screening seriously to ensure suitable candidate-employer matches are made.' },
-                { icon: 'ScaleIcon', title: 'Legal Compliance', desc: 'All processes are conducted in accordance with applicable UK employment law and regulations.' },
-              ].map((item) => (
+              {content.compFeatures?.map((item: any) => (
                 <div key={item.title} className="flex items-start gap-4 p-4 bg-card rounded-xl border border-border">
                   <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
                     <Icon name={item.icon as Parameters<typeof Icon>[0]['name']} size={18} className="text-secondary" />
@@ -85,7 +104,7 @@ export default function AboutCompliance() {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {checks.map((check) => (
+              {content.compChecks?.map((check: string) => (
                 <div key={check} className="flex items-center gap-3 p-3 bg-muted rounded-xl">
                   <div className="w-6 h-6 rounded-full bg-accent/15 flex items-center justify-center flex-shrink-0">
                     <Icon name="CheckIcon" size={12} className="text-accent" />
