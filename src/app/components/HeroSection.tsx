@@ -92,7 +92,13 @@ export default function HeroSection() {
             </div>
 
             <h1 className="fade-up stagger-1 text-4xl md:text-5xl lg:text-6xl font-black text-primary leading-tight tracking-tighter">
-              {content.heroTitle}
+              {content.heroTitle.split('*').map((part, i) => 
+                i % 2 === 1 ? (
+                  <span key={i} className="text-accent">{part}</span>
+                ) : (
+                  part
+                )
+              )}
             </h1>
 
             <p className="fade-up stagger-2 text-foreground/90 text-lg leading-relaxed max-w-2xl font-medium">

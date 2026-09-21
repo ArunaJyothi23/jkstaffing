@@ -9,7 +9,7 @@ export default function OverviewPage() {
   const [contentId, setContentId] = useState<string | null>(null);
   
   const [content, setContent] = useState({
-    heroTitle: 'Connecting Businesses with Reliable People & Candidates with Great Opportunities',
+    heroTitle: 'Connecting Businesses with *Reliable People* & Candidates with Great Opportunities',
     heroImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1d0346ec5-1772458054183.png',
     aboutTitle: 'People. Service. Opportunity.',
     aboutDescription: 'JK Staffing & Services Management Ltd provides human resources management, staffing solutions, and private security activities across the UK. We bridge the gap between businesses seeking dependable staff and individuals seeking meaningful work.',
@@ -41,9 +41,9 @@ export default function OverviewPage() {
           aboutVision: doc.aboutVision || content.aboutVision,
           aboutMission: doc.aboutMission || content.aboutMission,
           aboutImage: doc.aboutImage || content.aboutImage,
-          footerEmail: doc.footerEmail || content.footerEmail,
-          footerHours: doc.footerHours || content.footerHours,
-          footerDescription: doc.footerDescription || content.footerDescription,
+          footerEmail: doc.footerEmail !== undefined ? doc.footerEmail : content.footerEmail,
+          footerHours: doc.footerHours !== undefined ? doc.footerHours : content.footerHours,
+          footerDescription: doc.footerDescription !== undefined ? doc.footerDescription : content.footerDescription,
         });
       }
     } catch (error) {
@@ -77,7 +77,9 @@ export default function OverviewPage() {
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hero Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Hero Title <span className="text-xs text-gray-400 font-normal ml-2">(Wrap text in *asterisks* to highlight it in orange)</span>
+            </label>
             <textarea 
               className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-[#FF6B2C] outline-none"
               rows={3}
