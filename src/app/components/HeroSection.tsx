@@ -17,7 +17,7 @@ const badges = [
 export default function HeroSection() {
   const heroRef = useRef<HTMLElement>(null);
   const [content, setContent] = useState({
-    heroTitle: 'Connecting Businesses with Reliable People & Candidates with Great Opportunities',
+    heroTitle: 'Connecting Businesses with *Reliable People* & Candidates with Great Opportunities',
     heroImage: 'https://img.rocket.new/generatedImages/rocket_gen_img_1d0346ec5-1772458054183.png',
   });
 
@@ -38,7 +38,18 @@ export default function HeroSection() {
 
     const unsubscribe = subscribeDocument('site_content', 'global', (doc) => {
       if (doc) {
-        setContent(prev => ({ ...prev, ...doc }));
+        let title = doc.heroTitle !== undefined ? doc.heroTitle : content.heroTitle;
+        
+        // Auto-fix if the database still has the old plain text without asterisks
+        if (title === 'Connecting Businesses with Reliable People & Candidates with Great Opportunities') {
+          title = 'Connecting Businesses with *Reliable People* & Candidates with Great Opportunities';
+        }
+
+        setContent(prev => ({ 
+          ...prev, 
+          ...doc,
+          heroTitle: title
+        }));
       }
     });
 
