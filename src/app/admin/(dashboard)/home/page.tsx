@@ -224,7 +224,7 @@ export default function HomeContentPage() {
         <h2 className="text-lg font-bold text-gray-800 mb-4">Hero Section</h2>
         <div className="space-y-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title (Use &lt;span class="text-accent"&gt; for highlighted text)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title (Use &lt;span class=&quot;text-accent&quot;&gt; for highlighted text)</label>
             <textarea rows={2} className="w-full border border-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-[#FF6B2C] outline-none" value={content.heroTitle} onChange={e => setContent({...content, heroTitle: e.target.value})} />
           </div>
           <div>
